@@ -1,33 +1,36 @@
 const express = require('express')
 const app = express()
-const bodyParser = require('body-parser');
-const cookieParser = require('cookie-parser');
-const config = require('./config/key');
-const { auth } = require('./middleware/auth');
-const { User } = require("./models/User");
+const port = 5000
+const bodyParser = require('body-parser')
+const cookieParser = require('cookie-parser')
+const config = require('./config/key')
+const { auth } = require('./middleware/auth')
+const { User } = require("./models/User")
 
-//application/x-www-form-urlencoded 
-app.use(bodyParser.urlencoded({ extended: true }));
+//application/x-www-form-urlencoded 형식의 데이터를 분석해서 가져올 수 있게 함
+app.use(bodyParser.urlencoded({ extended: true }))
 
-//application/json 
-app.use(bodyParser.json());
-app.use(cookieParser());
+//application/json  형식의 데이터를 분석해서 가져올 수 있게 함
+app.use(bodyParser.json())
+app.use(cookieParser())
 
+// DB connect!
 const mongoose = require('mongoose')
 mongoose.connect(config.mongoURI, {
   useNewUrlParser: true, useUnifiedTopology: true, useCreateIndex: true, useFindAndModify: false
-}).then(() => console.log('MongoDB Connected...'))
+}).then(() => console.log('MongoDB Connected!))
   .catch(err => console.log(err))
 
-
+// Root page
 app.get('/', (req, res) => res.send('Hello World!~~ '))
 
 app.get('/api/hello', (req, res) => res.send('Hello World!~~ '))
 
+// Register Route
 app.post('/api/users/register', (req, res) => {
 
   //회원 가입 할떄 필요한 정보들을  client에서 가져오면 
-  //그것들을  데이터 베이스에 넣어준다. 
+  //그것들을  데이터 베이스에 넣어준다.  
   const user = new User(req.body)
 
   user.save((err, userInfo) => {
@@ -38,6 +41,7 @@ app.post('/api/users/register', (req, res) => {
   })
 })
 
+// Login Route
 app.post('/api/users/login', (req, res) => {
 
   // console.log('ping')
@@ -63,7 +67,7 @@ app.post('/api/users/login', (req, res) => {
 
       //비밀번호 까지 맞다면 토큰을 생성하기.
       user.generateToken((err, user) => {
-        if (err) return res.status(400).send(err);
+        if (err) return res.status(400).send(err)
 
         // 토큰을 저장한다.  어디에 ?  쿠키 , 로컳스토리지 
         res.cookie("x_auth", user.token)
@@ -74,7 +78,7 @@ app.post('/api/users/login', (req, res) => {
   })
 })
 
-
+// Role Route
 // role 1 어드민    role 2 특정 부서 어드민 
 // role 0 -> 일반유저   role 0이 아니면  관리자 
 app.get('/api/users/auth', auth, (req, res) => {
@@ -91,22 +95,17 @@ app.get('/api/users/auth', auth, (req, res) => {
   })
 })
 
+// Logout Route
 app.get('/api/users/logout', auth, (req, res) => {
   // console.log('req.user', req.user)
   User.findOneAndUpdate({ _id: req.user._id },
     { token: "" }
     , (err, user) => {
-      if (err) return res.json({ success: false, err });
+      if (err) return res.json({ success: false, err })
       return res.status(200).send({
         success: true
       })
     })
 })
-
-
-
-
-
-const port = 5000
 
 app.listen(port, () => console.log(`Example app listening on port ${port}!`))

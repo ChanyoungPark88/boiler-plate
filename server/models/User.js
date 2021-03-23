@@ -3,7 +3,7 @@ const bcrypt = require('bcrypt');
 const saltRounds = 10
 const jwt = require('jsonwebtoken');
 
-
+// 유저 스키마 생성
 const userSchema = mongoose.Schema({
     name: {
         type: String,
@@ -34,7 +34,7 @@ const userSchema = mongoose.Schema({
         type: Number
     }
 })
-
+// 유저 스키마 끝
 
 userSchema.pre('save', function (next) {
     var user = this;
@@ -96,7 +96,7 @@ userSchema.statics.findByToken = function(token, cb) {
 }
 
 
-
+// 스키마를 모델로 감싼다
 const User = mongoose.model('User', userSchema)
-
+// 모델을 다른 파일에서도 사용할 수 있도록 export
 module.exports = { User }
