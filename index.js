@@ -4,6 +4,7 @@ const port = 3000
 const bodyParser = require('body-parser')
 const cookieParser = require('cookie-parser')
 const config = require('./config/key')
+const {auth} = require('./middleware/auth')
 const {User} = require('./models/User')
 
 // bodyPaser 설정
@@ -20,6 +21,7 @@ mongoose.connect(config.mongoURI,{
 
 app.get('/',(req,res)=>res.send('Fuck you world! You guys all suck!'))
 
+// register Route
 app.post('/api/users/register',(req,res)=>{
     // 회원가입할 때 필요한 정보들을 클라이언트에서 가져오면 DB에 넣어준다.
     const user = new User(req.body)
@@ -29,6 +31,7 @@ app.post('/api/users/register',(req,res)=>{
     })
 })
 
+// login Route
 app.post('/api/users/login',(req,res)=>{
     // 요청된 이메일이 DB에 있는지 확인
     User.findOne({email:req.body.email},(err,userInfo)=>{
@@ -52,10 +55,35 @@ app.post('/api/users/login',(req,res)=>{
                     res.cookie('x_auth',userInfo.token)
                     .status(200)
                     .json({
-                        loginSuccess:true,userId:userInfo._id
+                        loginSuccess:true,
+                        userId:userInfo._id
                     })
                 })
             }
+        })
+    })
+})
+
+// auth Route
+app.get('/api/users/auth',auth,(req,res)=>{
+    res.status(200).json({
+        _id:req.user._id,
+        isAdmin:req.user.role === 0 ? false : true,
+        isAuth:true,
+        email:req.user.email,
+        name:req.user.name,
+        lastname:req.user.lastname,
+        role:req.user.role,
+        image:req.user.image
+    })
+})
+
+// logout Route
+app.get('/api/users/logout',auth,(req,res)=>{
+    User.findOneAndUpdate({_id:req.user._id},{token:''},(err,user)=>{
+        if(err) return res.json({success:false,err})
+        return res.status(200).send({
+            success:true
         })
     })
 })
