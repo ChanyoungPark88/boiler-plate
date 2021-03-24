@@ -1,14 +1,15 @@
 import React,{useEffect} from 'react'
-import axios from 'axios'
+import Axios from 'axios'
+// import {withRouter} from 'react-router-dom'
 
 function LandingPage(props) {
     useEffect(()=>{
-        axios.get('/api/hello')
+        Axios.get('/api/hello')
         .then(response=>console.log(response))
     },[])
 
     const onClickHandler = (event) => {
-        axios.get('/api/users/logout')
+        Axios.get('/api/users/logout')
             .then(response=>{
                 if(response.data.success){
                     props.history.push('/login')
@@ -26,4 +27,5 @@ function LandingPage(props) {
     )
 }
 
+// export default withRouter(LandingPage)
 export default LandingPage
