@@ -1,6 +1,6 @@
 const express = require('express')
 const app = express()
-const port = 3000
+const port = 5000
 const bodyParser = require('body-parser')
 const cookieParser = require('cookie-parser')
 const config = require('./config/key')
@@ -20,6 +20,8 @@ mongoose.connect(config.mongoURI,{
 
 
 app.get('/',(req,res)=>res.send('Fuck you world! You guys all suck!'))
+
+app.get('/api/hello',(req,res)=>res.send('Hello guys'))
 
 // register Route
 app.post('/api/users/register',(req,res)=>{
