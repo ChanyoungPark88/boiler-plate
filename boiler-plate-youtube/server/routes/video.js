@@ -5,7 +5,8 @@ const path = require('path')
 
 const { auth } = require("../middleware/auth");
 const multer = require('multer')
-
+const ffmpeg = require('fluent-ffmpeg');
+const { fileURLToPath } = require('url');
 const storage = multer.diskStorage({
     destination: (req,file,cb) =>{
         cb(null, 'uploads/')
@@ -36,5 +37,36 @@ router.post("/uploadfiles", (req, res) => {
     })
 })
 
+router.post("/thumbnail", (req, res) => {
+    let filePath = ''
+    let fileDuration = ''
+    // get video Duration
+    ffmpeg.ffprobe(req.body.url,function(err,metadata){
+        console.dir(metadata)
+        console.dir(metadata.format.duration)
+        fileDuration = metadata.format.duration
+    })
+    // Create thumbnail
+    ffmpeg(req.body.url)
+    .on('filenames',function(filename){
+        console.log('Will generate '+filename.join(', '))
+        console.log(filename)
+        filePath = 'uploads/thumbnails/'+filename[0]
+    })
+    .on('end',function(){
+        console.log('Screenshots taken')
+        return res.json({success:true,url:filePath,fileDuration:fileDuration})
+    })
+    .on('error',function(err){
+        console.error(err)
+        return res.json({success:false,err})
+    })
+    .screenshot({
+        count:3,
+        folder:'uploads/thumbnails',
+        size:'320x240',
+        filename:'thumbnail-%b.png'
+    })
+})
 
 module.exports = router
