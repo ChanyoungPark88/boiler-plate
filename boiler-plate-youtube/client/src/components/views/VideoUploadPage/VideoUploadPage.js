@@ -1,8 +1,8 @@
 import React, { useState } from 'react'
 import { Typography, Button, Form, message, Input } from 'antd'
-import Icon, { PlusOutlined } from '@ant-design/icons'
+import /*Icon,*/ { PlusOutlined } from '@ant-design/icons'
 import Dropzone from 'react-dropzone'
-import { getIn } from 'formik'
+// import { getIn } from 'formik'
 import Axios from 'axios'
 import { useSelector } from 'react-redux'
 
@@ -43,7 +43,7 @@ function VideoUploadPage(props) {
         setCategory(e.currentTarget.value)
     }
     const onDrop = (files) => {
-        let formData = new FormData
+        let formData = new FormData()
         const config = {
             header:{'content-type':'multipart/form-data'}
         }

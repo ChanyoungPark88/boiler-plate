@@ -45,6 +45,13 @@ router.post("/uploadVideo", (req, res) => {
     })
 })
 
+router.get("/getVideos", (req, res) => {
+    Video.find().populate('writter').exec((err,videos) => {
+        if(err) return res.status(400).send(err)
+        res.status(200).json({success:true, videos})
+    })
+})
+
 router.post("/thumbnail", (req, res) => {
     let filePath = ''
     let fileDuration = ''
