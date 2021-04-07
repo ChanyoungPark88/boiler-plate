@@ -84,4 +84,12 @@ router.post("/thumbnail", (req, res) => {
     })
 })
 
+router.post("/getVideo", (req, res) => {
+    Video.findOne({ "_id" : req.body.videoId })
+    .populate('writter')
+    .exec((err, video) => {
+        if(err) return res.status(400).send(err);
+        res.status(200).json({ success: true, video })
+    })
+})
 module.exports = router
