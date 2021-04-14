@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { List, Row, Col, Avatar } from 'antd'
 import axios from 'axios'
 import SideVideo from './Sections/SideVideo'
+import Subscribe from './Sections/Subscribe'
 
 function VideoDetailPage(props) {
     const videoId = props.match.params.videoId
@@ -19,13 +20,14 @@ function VideoDetailPage(props) {
         })
     },[])
     if(Video.writter){
+        const subscribeButton = Video.writter._id !== localStorage.getItem('userId') && <Subscribe userTo={Video.writter._id} userFrom={localStorage.getItem('userId')}/>
         return (
             <Row gutter={[16,16]}>
                 <Col lg={18} xs={24}>
                     <div style={{width:'100%', padding:'3rem 4rem'}}>
                         <video style={{width:'100%'}} src={`http://localhost:5000/${Video.filePath}`} controls />
                         <List.Item
-                            actions
+                            actions={[subscribeButton]}
                         >
                             <List.Item.Meta
                                 avatar={<Avatar src={Video.avatar} />}

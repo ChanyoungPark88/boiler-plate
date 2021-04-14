@@ -1,7 +1,8 @@
 const express = require('express')
 const router = express.Router()
 const path = require('path')
-const { Video } = require("../models/video")
+const { Video } = require("../models/Video")
+const { Subscriber } = require('../models/Subscriber')
 const { auth } = require("../middleware/auth")
 const multer = require('multer')
 const ffmpeg = require('fluent-ffmpeg')
@@ -92,4 +93,25 @@ router.post("/getVideo", (req, res) => {
         res.status(200).json({ success: true, video })
     })
 })
+
+router.post("/getSubscriptionVideos", (req, res) => {
+    Subscriber.find({'userFrom':req.body.userFrom})
+    .exec((err,subscriberInfo)=>{
+        if(err) return res.status(400).send(err)
+
+        let subscribedUser = []
+
+        subscriberInfo.map((subscriber,i) => {
+            subscribedUser.push(subscriber.userTo)
+        })
+
+        Video.find({writter:{ $in:subscribedUser }})
+        .populate('writter')
+        .exec((err,videos) => {
+            if(err) return res.status(400).send(err)
+            res.status(200).json({success:true,videos})
+        })
+    })
+})
+
 module.exports = router
